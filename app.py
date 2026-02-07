@@ -71,9 +71,9 @@ st.markdown("""
         color: #f1f5f9 !important;
     }
     
-    /* Labels dos Inputs (Mês de Referência, Descrição, etc) MAIORES */
+    /* Labels dos Inputs */
     label {
-        font-size: 1.1rem !important; /* Aumentado */
+        font-size: 1.1rem !important;
         font-weight: 600 !important;
         color: #e2e8f0 !important;
         margin-bottom: 8px !important;
@@ -91,7 +91,7 @@ st.markdown("""
         background-color: rgba(255, 255, 255, 0.05) !important;
         color: #f1f5f9 !important;
         border: 1px solid rgba(255,255,255, 0.1) !important;
-        font-size: 1rem !important; /* Texto digitado maior */
+        font-size: 1rem !important;
     }
 
     /* Cards Glassmorphism */
@@ -108,13 +108,13 @@ st.markdown("""
     [data-testid="stDataFrame"] { background-color: transparent !important; }
     [data-testid="stDataFrame"] div[class^="st"] { color: #e2e8f0; }
     
-    /* ABAS MAIORES E MAIS VISÍVEIS */
+    /* ABAS */
     .stTabs [data-baseweb="tab-list"] { gap: 15px; background-color: transparent; border: none !important; }
     .stTabs [data-baseweb="tab"] {
-        padding: 15px 30px; /* Mais espaçamento */
+        padding: 15px 30px;
         border-radius: 12px; 
         font-weight: 700;
-        font-size: 1.15rem; /* Fonte da aba maior */
+        font-size: 1.15rem;
         background-color: rgba(255, 255, 255, 0.05);
         color: #cbd5e1; transition: all 0.3s;
     }
@@ -181,7 +181,6 @@ st.markdown("<h1 class='aura-title'>Aura OS Finance</h1>", unsafe_allow_html=Tru
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["💎 Dashboard", "🎯 Metas", "📊 Evolução", "⚙️ Ajustes", "⚠️ Limites"])
 
 with tab1:
-    # Filtro de Mês
     m_sel = st.selectbox("Mês de Referência:", meses_disponiveis, key="dash_m")
     
     if not df.empty: df_f = df[df['mes_ano'] == m_sel]
@@ -206,33 +205,17 @@ with tab1:
     c2.markdown(f"<div class='custom-card'><h3>Saídas</h3><h2><span style='color:#ef4444 !important'>{formata_br(sai_s)}</span></h2></div>", unsafe_allow_html=True)
     c3.markdown(f"<div class='custom-card'><h3>Saldo</h3><h2>{formata_br(rec_s - sai_s)}</h2></div>", unsafe_allow_html=True)
 
-    # LIMITES (Lógica de Saldo Negativo)
+    # Alerta simples de Limites (Resumo)
     if not df_orc.empty:
-        st.subheader("⚠️ Limites Mensais")
+        st.write("---")
+        st.caption("Visão Rápida dos Limites (Detalhes na aba 'Limites')")
         cols_o = st.columns(len(df_orc))
         for i, row in df_orc.iterrows():
             gasto = df_f[(df_f['categoria'] == row['categoria']) & (df_f['tipo'] == 'Despesa')]['valor'].sum() if not df_f.empty else 0.0
-            
-            # Cálculo REAL (permite negativo)
             saldo_limite = row['limite'] - gasto
-            
-            # Barra de progresso (se estourar, fica cheia 1.0)
-            if row['limite'] > 0:
-                progresso = min(gasto / row['limite'], 1.0)
-            else:
-                progresso = 1.0
-
-            with cols_o[i]:
-                with st.container(border=True):
-                    st.write(f"**{row['categoria']}**")
-                    st.progress(progresso)
-                    
-                    # Exibição Condicional
-                    if saldo_limite >= 0:
-                        st.caption(f"✅ Livre: {formata_br(saldo_limite)}")
-                    else:
-                        # Texto vermelho para estouro
-                        st.markdown(f"<span style='color:#ff4d4d; font-weight:bold'>🚨 Estourou: {formata_br(saldo_limite)}</span>", unsafe_allow_html=True)
+            if saldo_limite < 0:
+                with cols_o[i]:
+                    st.markdown(f"🚨 **{row['categoria']}**: Estourou {formata_br(saldo_limite)}")
 
     st.write("---")
     
@@ -315,12 +298,7 @@ with tab4:
                     conn=sqlite3.connect('financas.db')
                     conn.execute("INSERT INTO recorrentes (descricao,valor,categoria,tipo) VALUES (?,?,?,?)",(n_f,v,"Contas","Despesa"))
                     conn.commit(); conn.close(); st.success("Gasto salvo!"); st.rerun()
-    with c2:
-        with st.container(border=True):
-            st.write("### ⚠️ Limites")
-            cl = st.selectbox("Cat.",["Alimentação","Transporte","Lazer","Contas","Outros"], key="aj_l"); vl = st.text_input("Limite", key="aj_lv")
-            if st.button("Definir"):
-                v=limpa_valor(vl); conn=sqlite3.connect('financas.db'); conn.execute("INSERT OR REPLACE INTO orcamentos (categoria,limite) VALUES (?,?)",(cl,v)); conn.commit(); conn.close(); st.rerun()
+    # Parte de Limites removida daqui e movida para a aba própria (tab5)
     with c3:
         with st.container(border=True):
             st.write("### 🎯 Metas")
@@ -330,29 +308,58 @@ with tab4:
 
 with tab5:
     st.subheader("⚠️ Gerenciar Limites")
-    cl = st.selectbox("Categoria", ["Alimentação", "Transporte", "Lazer", "Contas", "Outros"], key="lim_cat")
-    vl = st.text_input("Limite (R$)", key="lim_val")
-    if st.button("Definir Limite"):
-        v = limpa_valor(vl)
-        conn = sqlite3.connect('financas.db')
-        conn.execute("INSERT OR REPLACE INTO orcamentos (categoria, limite) VALUES (?, ?)", (cl, v))
-        conn.commit()
-        conn.close()
-        st.success("Limite atualizado com sucesso!")
-        st.rerun()
+    
+    col_add, col_rem = st.columns(2)
+
+    # --- ADICIONAR / EDITAR ---
+    with col_add:
+        with st.container(border=True):
+            st.write("### ➕ Definir Limite")
+            cl = st.selectbox("Categoria", ["Alimentação", "Transporte", "Lazer", "Contas", "Outros"], key="lim_cat")
+            vl = st.text_input("Limite (R$)", key="lim_val")
+            if st.button("Salvar Limite", use_container_width=True):
+                v = limpa_valor(vl)
+                if v:
+                    conn = sqlite3.connect('financas.db')
+                    conn.execute("INSERT OR REPLACE INTO orcamentos (categoria, limite) VALUES (?, ?)", (cl, v))
+                    conn.commit(); conn.close(); st.success("Atualizado!"); st.rerun()
+
+    # --- REMOVER (NOVA FUNCIONALIDADE) ---
+    with col_rem:
+        with st.container(border=True):
+            st.write("### 🗑️ Excluir Limite")
+            if not df_orc.empty:
+                lim_to_del = st.selectbox("Selecione para remover:", df_orc['categoria'].tolist(), key="del_lim_sel")
+                if st.button("Excluir Limite Selecionado", type="primary", use_container_width=True):
+                    conn = sqlite3.connect('financas.db')
+                    conn.execute("DELETE FROM orcamentos WHERE categoria = ?", (lim_to_del,))
+                    conn.commit(); conn.close(); st.warning("Limite removido."); st.rerun()
+            else:
+                st.info("Nenhum limite cadastrado para excluir.")
+
+    st.write("---")
+    st.subheader("Acompanhamento Visual")
 
     if not df_orc.empty:
-        st.subheader("Limites Atuais")
-        cols_o = st.columns(len(df_orc))
+        cols_o = st.columns(2) # Organizado em 2 colunas
         for i, row in df_orc.iterrows():
+            col_idx = i % 2
             gasto = df[(df['categoria'] == row['categoria']) & (df['tipo'] == 'Despesa')]['valor'].sum() if not df.empty else 0.0
             saldo_limite = row['limite'] - gasto
             progresso = min(gasto / row['limite'], 1.0) if row['limite'] > 0 else 1.0
 
-            with cols_o[i]:
-                st.write(f"**{row['categoria']}**")
-                st.progress(progresso)
-                if saldo_limite >= 0:
-                    st.caption(f"✅ Livre: {formata_br(saldo_limite)}")
-                else:
-                    st.markdown(f"<span style='color:#ff4d4d; font-weight:bold'>🚨 Estourou: {formata_br(saldo_limite)}</span>", unsafe_allow_html=True)
+            with cols_o[col_idx]:
+                with st.container(border=True):
+                    st.write(f"### {row['categoria']}")
+                    st.progress(progresso)
+                    
+                    c_l1, c_l2 = st.columns(2)
+                    c_l1.caption(f"Gasto: {formata_br(gasto)}")
+                    
+                    with c_l2:
+                        if saldo_limite >= 0:
+                            st.markdown(f"<div style='text-align:right; color:#34d399; font-weight:bold'>✅ Livre: {formata_br(saldo_limite)}</div>", unsafe_allow_html=True)
+                        else:
+                            st.markdown(f"<div style='text-align:right; color:#ff4d4d; font-weight:bold'>🚨 Estourou: {formata_br(saldo_limite)}</div>", unsafe_allow_html=True)
+    else:
+        st.info("Defina seus primeiros limites acima.")
