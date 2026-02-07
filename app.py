@@ -4,7 +4,7 @@ import sqlite3
 import plotly.express as px
 from datetime import datetime
 
-# --- 1. GESTÃO DE DADOS (DATABASE) ---
+# --- 1. GESTÃO DE DADOS ---
 def iniciar_db():
     conn = sqlite3.connect('financas.db')
     c = conn.cursor()
@@ -45,12 +45,12 @@ def deletar_registros_massa(ids):
 
 iniciar_db()
 
-# --- 2. MOTOR VISUAL AURA DARK ---
+# --- 2. MOTOR VISUAL AURA TITAN ---
 st.set_page_config(page_title="Aura OS Finance", layout="wide", page_icon="🌌")
 
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Inter:wght@400;600&display=swap');
     
     @keyframes ps3Wave {
         0% { background-position: 0% 50%; }
@@ -65,71 +65,84 @@ st.markdown("""
         color: #f1f5f9 !important;
         font-family: 'Inter', sans-serif;
     }
-    
-    /* AUMENTO DE FONTE GERAL E CONTRASTE */
-    h1, h2, h3, h4, h5, h6, p, span, div, [data-testid="stMetricValue"], [data-testid="stMetricLabel"] {
-        color: #f1f5f9 !important;
-    }
-    
-    /* Labels dos Inputs */
-    label {
-        font-size: 1.1rem !important;
-        font-weight: 600 !important;
-        color: #e2e8f0 !important;
-        margin-bottom: 8px !important;
-    }
 
-    /* Sidebar Glass */
+    /* FONTES GIGANTES */
+    html, body, p, div, label, span { font-size: 18px !important; }
+    h1 { font-size: 4rem !important; font-weight: 900 !important; color: #f1f5f9 !important; }
+    h2 { font-size: 2.5rem !important; font-weight: 700 !important; color: #f1f5f9 !important; }
+    h3 { font-size: 2rem !important; font-weight: 600 !important; color: #f1f5f9 !important; }
+
+    /* SIDEBAR */
     [data-testid="stSidebar"] {
-        background-color: rgba(15, 15, 20, 0.5) !important;
+        background-color: rgba(15, 15, 20, 0.6) !important;
         backdrop-filter: blur(25px);
         border-right: 1px solid rgba(255,255,255, 0.1);
     }
-    
-    /* Inputs */
-    input, select, textarea, [data-baseweb="select"], [data-baseweb="input"] {
-        background-color: rgba(255, 255, 255, 0.05) !important;
-        color: #f1f5f9 !important;
-        border: 1px solid rgba(255,255,255, 0.1) !important;
-        font-size: 1rem !important;
+    [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, [data-testid="stSidebar"] label {
+        font-size: 1.1rem !important; color: #f1f5f9 !important;
     }
 
-    /* Cards Glassmorphism */
-    .custom-card {
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(15px);
-        padding: 25px;
-        border-radius: 24px;
-        border: 1px solid rgba(255,255,255, 0.08);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-        margin-bottom: 20px;
+    /* INPUTS */
+    .stTextInput input, .stSelectbox div[data-baseweb="select"] > div, .stDateInput input, .stNumberInput input {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        color: #fff !important;
+        font-size: 1.3rem !important;
+        height: 3.5rem !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(255,255,255, 0.2) !important;
     }
     
-    [data-testid="stDataFrame"] { background-color: transparent !important; }
-    [data-testid="stDataFrame"] div[class^="st"] { color: #e2e8f0; }
+    div[data-testid="stWidgetLabel"] p {
+        font-size: 1.3rem !important;
+        font-weight: 700 !important;
+        color: #a64dff !important;
+    }
+
+    /* BOTÕES */
+    .stButton button {
+        font-size: 1.3rem !important;
+        font-weight: 700 !important;
+        padding: 0.8rem 2rem !important;
+        border-radius: 12px !important;
+        height: auto !important; color: #f1f5f9 !important;
+    }
+
+    /* CARDS */
+    .custom-card {
+        background: rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(15px);
+        padding: 30px;
+        border-radius: 24px;
+        border: 1px solid rgba(255,255,255, 0.1);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        margin-bottom: 25px;
+    }
     
     /* ABAS */
-    .stTabs [data-baseweb="tab-list"] { gap: 15px; background-color: transparent; border: none !important; }
+    .stTabs [data-baseweb="tab-list"] { gap: 15px; }
     .stTabs [data-baseweb="tab"] {
-        padding: 15px 30px;
-        border-radius: 12px; 
-        font-weight: 700;
-        font-size: 1.15rem;
+        padding: 15px 35px;
+        border-radius: 15px; 
         background-color: rgba(255, 255, 255, 0.05);
-        color: #cbd5e1; transition: all 0.3s;
+        color: #cbd5e1; border: none;
+    }
+    .stTabs [data-baseweb="tab"] p {
+        font-size: 1.5rem !important; font-weight: 800 !important;
     }
     .stTabs [aria-selected="true"] {
         background-color: #a64dff !important;
         color: white !important;
-        box-shadow: 0 0 15px rgba(166, 77, 255, 0.5);
+        box-shadow: 0 0 20px rgba(166, 77, 255, 0.5);
     }
+    
+    [data-testid="stDataFrame"] { background-color: transparent !important; }
 
     .aura-title {
-        font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 3.5rem;
+        font-family: 'Montserrat', sans-serif; font-weight: 800; 
         background: linear-gradient(90deg, #ff4d4d, #a64dff);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 20px;
+        margin-bottom: 30px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -171,6 +184,7 @@ with st.sidebar:
     v_fin = limpa_valor(v_raw)
     dt_sel = st.date_input("Data", datetime.now(), key="side_dt")
 
+    st.markdown("<br>", unsafe_allow_html=True)
     if st.button("⚡ REGISTRAR", use_container_width=True, key="btn_reg"):
         if v_fin > 0:
             salvar_transacao(d_sel, v_fin, t_sel, c_sel, dt_sel)
@@ -178,11 +192,10 @@ with st.sidebar:
 
 # --- 5. DASHBOARD ---
 st.markdown("<h1 class='aura-title'>Aura OS Finance</h1>", unsafe_allow_html=True)
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["💎 Dashboard", "🎯 Metas", "📊 Evolução", "⚙️ Ajustes", "⚠️ Limites"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["💎 Dashboard", "🎯 Metas", "⚠️ Limites", "📊 Evolução", "⚙️ Ajustes"])
 
 with tab1:
     m_sel = st.selectbox("Mês de Referência:", meses_disponiveis, key="dash_m")
-    
     if not df.empty: df_f = df[df['mes_ano'] == m_sel]
     else: df_f = pd.DataFrame(columns=df.columns)
 
@@ -205,7 +218,6 @@ with tab1:
     c2.markdown(f"<div class='custom-card'><h3>Saídas</h3><h2><span style='color:#ef4444 !important'>{formata_br(sai_s)}</span></h2></div>", unsafe_allow_html=True)
     c3.markdown(f"<div class='custom-card'><h3>Saldo</h3><h2>{formata_br(rec_s - sai_s)}</h2></div>", unsafe_allow_html=True)
 
-    # Alerta simples de Limites (Resumo)
     if not df_orc.empty:
         st.write("---")
         st.caption("Visão Rápida dos Limites (Detalhes na aba 'Limites')")
@@ -218,8 +230,8 @@ with tab1:
                     st.markdown(f"🚨 **{row['categoria']}**: Estourou {formata_br(saldo_limite)}")
 
     st.write("---")
-    
     col_pie, col_tab = st.columns([1, 1.5])
+    
     with col_pie:
         st.subheader("Distribuição")
         if not df_f.empty:
@@ -253,11 +265,39 @@ with tab1:
                     deletar_registros_massa(ids); st.rerun()
         else: st.info("Nenhum lançamento.")
 
+# --- ABA 2: METAS (COM GESTÃO) ---
 with tab2:
-    st.subheader("🎯 Objetivos")
+    st.subheader("🎯 Gestão de Objetivos")
+    col_add_m, col_rem_m = st.columns(2)
+    
+    with col_add_m:
+        with st.container(border=True):
+            st.write("### ➕ Nova Meta")
+            nm = st.text_input("Nome", key="new_meta_name")
+            vm = st.text_input("Alvo (R$)", key="new_meta_val")
+            if st.button("Criar Meta", use_container_width=True):
+                v = limpa_valor(vm)
+                if v and nm:
+                    conn = sqlite3.connect('financas.db')
+                    conn.execute("INSERT INTO metas (nome,objetivo,atual) VALUES (?,?,0)", (nm, v))
+                    conn.commit(); conn.close(); st.success("Meta Criada!"); st.rerun()
+
+    with col_rem_m:
+        with st.container(border=True):
+            st.write("### 🗑️ Excluir Meta")
+            if not df_metas.empty:
+                meta_to_del = st.selectbox("Selecionar Meta:", df_metas['nome'].tolist(), key="del_meta_sel")
+                if st.button("Excluir Selecionada", type="primary", use_container_width=True):
+                    conn = sqlite3.connect('financas.db')
+                    conn.execute("DELETE FROM metas WHERE nome = ?", (meta_to_del,))
+                    conn.commit(); conn.close(); st.warning("Meta removida."); st.rerun()
+            else:
+                st.info("Nenhuma meta para excluir.")
+
+    st.write("---")
     if not df_metas.empty:
         for _, m in df_metas.iterrows():
-            prog = (m['atual'] / m['objetivo'])
+            prog = (m['atual'] / m['objetivo']) if m['objetivo'] > 0 else 0
             with st.container(border=True):
                 cm, cl = st.columns([3, 1])
                 with cm:
@@ -265,53 +305,13 @@ with tab2:
                     c1,c2,c3=st.columns(3)
                     c1.write(f"**{prog:.1%}**"); c2.write(f"💰 {formata_br(m['atual'])}"); c3.write(f"🎯 {formata_br(m['objetivo'])}")
                 with cl: st.metric("Falta", formata_br(max(m['objetivo'] - m['atual'], 0)))
-    else: st.info("Configure metas.")
+    else: st.info("Defina suas metas acima.")
 
+# --- ABA 3: LIMITES ---
 with tab3:
-    st.subheader("📊 Evolução")
-    if not df.empty:
-        df_e = df.groupby(['mes_ano', 'tipo'])['valor'].sum().reset_index()
-        df_e['dt'] = pd.to_datetime(df_e['mes_ano'], format='%m/%Y')
-        fig = px.line(df_e.sort_values('dt'), x='mes_ano', y='valor', color='tipo', markers=True, template="plotly_dark", line_shape='spline')
-        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
-        st.plotly_chart(fig, use_container_width=True)
-    else: st.info("Sem dados.")
-
-with tab4:
-    st.subheader("⚙️ Configuração")
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        with st.container(border=True):
-            st.write("### 🏠 Fixos")
-            s = st.text_input("Salário", key="aj_s")
-            if st.button("Salvar Salário"):
-                v=limpa_valor(s)
-                if v: 
-                    conn=sqlite3.connect('financas.db')
-                    conn.execute("DELETE FROM recorrentes WHERE categoria='Salário'")
-                    conn.execute("INSERT INTO recorrentes (descricao,valor,categoria,tipo) VALUES (?,?,?,?)",("Salário",v,"Salário","Receita"))
-                    conn.commit(); conn.close(); st.success("Salário salvo! Vá ao Dashboard lançar."); st.rerun()
-            st.write("---"); n_f=st.text_input("Gasto", key="aj_n"); v_f=st.text_input("Valor", key="aj_v")
-            if st.button("Salvar Gasto"):
-                v=limpa_valor(v_f)
-                if v: 
-                    conn=sqlite3.connect('financas.db')
-                    conn.execute("INSERT INTO recorrentes (descricao,valor,categoria,tipo) VALUES (?,?,?,?)",(n_f,v,"Contas","Despesa"))
-                    conn.commit(); conn.close(); st.success("Gasto salvo!"); st.rerun()
-    # Parte de Limites removida daqui e movida para a aba própria (tab5)
-    with c3:
-        with st.container(border=True):
-            st.write("### 🎯 Metas")
-            nm=st.text_input("Nome", key="aj_nm"); vm=st.text_input("Alvo", key="aj_vm")
-            if st.button("Criar"):
-                v=limpa_valor(vm); conn=sqlite3.connect('financas.db'); conn.execute("INSERT INTO metas (nome,objetivo,atual) VALUES (?,?,0)",(nm,v)); conn.commit(); conn.close(); st.rerun()
-
-with tab5:
     st.subheader("⚠️ Gerenciar Limites")
-    
     col_add, col_rem = st.columns(2)
 
-    # --- ADICIONAR / EDITAR ---
     with col_add:
         with st.container(border=True):
             st.write("### ➕ Definir Limite")
@@ -324,27 +324,24 @@ with tab5:
                     conn.execute("INSERT OR REPLACE INTO orcamentos (categoria, limite) VALUES (?, ?)", (cl, v))
                     conn.commit(); conn.close(); st.success("Atualizado!"); st.rerun()
 
-    # --- REMOVER (NOVA FUNCIONALIDADE) ---
     with col_rem:
         with st.container(border=True):
             st.write("### 🗑️ Excluir Limite")
             if not df_orc.empty:
                 lim_to_del = st.selectbox("Selecione para remover:", df_orc['categoria'].tolist(), key="del_lim_sel")
-                if st.button("Excluir Limite Selecionado", type="primary", use_container_width=True):
+                if st.button("Excluir Limite", type="primary", use_container_width=True):
                     conn = sqlite3.connect('financas.db')
                     conn.execute("DELETE FROM orcamentos WHERE categoria = ?", (lim_to_del,))
-                    conn.commit(); conn.close(); st.warning("Limite removido."); st.rerun()
+                    conn.commit(); conn.close(); st.warning("Removido."); st.rerun()
             else:
-                st.info("Nenhum limite cadastrado para excluir.")
+                st.info("Nenhum limite cadastrado.")
 
     st.write("---")
-    st.subheader("Acompanhamento Visual")
-
     if not df_orc.empty:
-        cols_o = st.columns(2) # Organizado em 2 colunas
+        cols_o = st.columns(2)
         for i, row in df_orc.iterrows():
             col_idx = i % 2
-            gasto = df[(df['categoria'] == row['categoria']) & (df['tipo'] == 'Despesa')]['valor'].sum() if not df.empty else 0.0
+            gasto = df_f[(df_f['categoria'] == row['categoria']) & (df_f['tipo'] == 'Despesa')]['valor'].sum() if not df_f.empty else 0.0
             saldo_limite = row['limite'] - gasto
             progresso = min(gasto / row['limite'], 1.0) if row['limite'] > 0 else 1.0
 
@@ -352,14 +349,60 @@ with tab5:
                 with st.container(border=True):
                     st.write(f"### {row['categoria']}")
                     st.progress(progresso)
-                    
-                    c_l1, c_l2 = st.columns(2)
-                    c_l1.caption(f"Gasto: {formata_br(gasto)}")
-                    
-                    with c_l2:
-                        if saldo_limite >= 0:
-                            st.markdown(f"<div style='text-align:right; color:#34d399; font-weight:bold'>✅ Livre: {formata_br(saldo_limite)}</div>", unsafe_allow_html=True)
-                        else:
-                            st.markdown(f"<div style='text-align:right; color:#ff4d4d; font-weight:bold'>🚨 Estourou: {formata_br(saldo_limite)}</div>", unsafe_allow_html=True)
+                    if saldo_limite >= 0:
+                        st.caption(f"✅ Livre: {formata_br(saldo_limite)}")
+                    else:
+                        st.markdown(f"<span style='color:#ff4d4d; font-weight:bold'>🚨 Estourou: {formata_br(saldo_limite)}</span>", unsafe_allow_html=True)
+    else: st.info("Defina limites acima.")
+
+# --- ABA 4: EVOLUÇÃO ---
+with tab4:
+    st.subheader("📊 Evolução")
+    if not df.empty:
+        df_e = df.groupby(['mes_ano', 'tipo'])['valor'].sum().reset_index()
+        df_e['dt'] = pd.to_datetime(df_e['mes_ano'], format='%m/%Y')
+        fig = px.line(df_e.sort_values('dt'), x='mes_ano', y='valor', color='tipo', markers=True, template="plotly_dark", line_shape='spline')
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+        st.plotly_chart(fig, use_container_width=True)
+    else: st.info("Sem dados.")
+
+# --- ABA 5: AJUSTES (RESTAURADA) ---
+with tab5:
+    st.subheader("⚙️ Configuração Automática")
+    
+    col_sal, col_fixos = st.columns(2)
+    
+    with col_sal:
+        with st.container(border=True):
+            st.write("### 🏠 Salário Mensal")
+            s = st.text_input("Valor do Salário (R$)", key="aj_s")
+            if st.button("Salvar Salário Padrão", use_container_width=True):
+                v=limpa_valor(s)
+                if v: 
+                    conn=sqlite3.connect('financas.db')
+                    conn.execute("DELETE FROM recorrentes WHERE categoria='Salário'")
+                    conn.execute("INSERT INTO recorrentes (descricao,valor,categoria,tipo) VALUES (?,?,?,?)",("Salário",v,"Salário","Receita"))
+                    conn.commit(); conn.close(); st.success("Salário definido! Irá aparecer no botão de lançar do Dashboard."); st.rerun()
+
+    with col_fixos:
+        with st.container(border=True):
+            st.write("### 📄 Contas Fixas (Todo Mês)")
+            n_f=st.text_input("Nome da Conta (ex: Aluguel)", key="aj_n")
+            v_f=st.text_input("Valor (R$)", key="aj_v")
+            if st.button("Adicionar Conta Fixa", use_container_width=True):
+                v=limpa_valor(v_f)
+                if v and n_f: 
+                    conn=sqlite3.connect('financas.db')
+                    conn.execute("INSERT INTO recorrentes (descricao,valor,categoria,tipo) VALUES (?,?,?,?)",(n_f,v,"Contas","Despesa"))
+                    conn.commit(); conn.close(); st.success(f"Conta '{n_f}' adicionada!"); st.rerun()
+            
+    # Tabela para ver o que já está cadastrado
+    st.write("---")
+    st.write("### 📋 Itens Automáticos Cadastrados:")
+    if not df_rec.empty:
+        st.dataframe(df_rec[['descricao', 'valor', 'tipo']], use_container_width=True, hide_index=True)
+        # Opção de limpar tudo se quiser recomeçar
+        if st.button("🗑️ Limpar Todas as Recorrências", type="secondary"):
+            conn=sqlite3.connect('financas.db'); conn.execute("DELETE FROM recorrentes"); conn.commit(); conn.close(); st.rerun()
     else:
-        st.info("Defina seus primeiros limites acima.")
+        st.info("Nenhuma conta fixa ou salário cadastrado ainda.")
